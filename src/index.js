@@ -1,30 +1,26 @@
-const express = require('express')
-const morgan = require('morgan');
 const path = require('path');
-const app = express()
-const port = 3000
+const express = require('express');
+const morgan = require('morgan');
+const handlebars = require('express-handlebars'); 
+const app = express();
+const port = 3000;
+const routes = require('./routes');
 
-app.use(express.static(path.join(__dirname, 'public')));
-    //--------------------------------------------//
-const exphbs = require('express-handlebars')
-const hbs = exphbs.create({ extname: '.hbs' })
-    // TEMPLATE ENGINE
-app.engine('hbs', hbs.engine)
+//http logger morgan 
+app.use(morgan('combined'))
+//urlencoded + json
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+//template engine
+app.engine('hbs', handlebars({
+  extname: '.hbs'
+}));
+app.set("view engine", ".hbs");
+app.set('views', path.join(__dirname, '/resources/views'));
 
-
-app.set('view engine', 'hbs');
-app.set("views", path.join(__dirname, 'resources\\Views')); // cách mình tìm đến file, hệ điều hành window
-
-
-//console.log('PATH: ', path.join(__dirname, 'resources/views')) //xem đường dẫn
-
-//
-//HTTP logger
-app.use(morgan('combined'));
-app.get('/', (req, res) => {
-    res.render('home')
-})
+//Route init       
+routes(app);       
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
-})
+  console.log(`Example app listening at http://localhost:${port}`)
+});
